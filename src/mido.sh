@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-: "${PROXY:=""}"
+: "${HTTP_PROXY:=""}"
 
 handle_curl_error() {
 
@@ -79,7 +79,7 @@ download_windows() {
   local product_edition_id=""
   local language_skuid_json=""
   local profile="606624d44113"
-  local proxy="${PROXY}"
+  local proxy="${HTTP_PROXY}"
 
   user_agent=$(get_agent)
   language=$(getLanguage "$lang" "name")
@@ -189,7 +189,7 @@ download_windows_eval() {
   local user_agent=""
   local enterprise_type=""
   local windows_version=""
-  local proxy="${PROXY}"
+  local proxy="${HTTP_PROXY}"
 
   case "${id,,}" in
     "win11${PLATFORM,,}-enterprise-eval" )
