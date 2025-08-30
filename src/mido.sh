@@ -404,6 +404,7 @@ getESD() {
   local language
   local editionName
   local winCatalog size
+  local proxy="${HTTP_PROXY}"
 
   culture=$(getLanguage "$lang" "culture")
   winCatalog=$(getCatalog "$version" "url")
@@ -424,7 +425,7 @@ getESD() {
   local eFile="esd_edition.xml"
   local fFile="products_filter.xml"
 
-  { wget "$winCatalog" -O "$dir/$wFile" -q --timeout=30 --no-http-keep-alive; rc=$?; } || :
+  { wget "$winCatalog" -O "$dir/$wFile" --proxy "$proxy" -q --timeout=30 --no-http-keep-alive; rc=$?; } || :
 
   msg="Failed to download $winCatalog"
   (( rc == 3 )) && error "$msg , cannot write file (disk full?)" && return 1
@@ -533,7 +534,8 @@ downloadFile() {
   local size="$4"
   local lang="$5"
   local desc="$6"
-  local msg="Downloading $desc"
+  local proxy="${HTTP_PROXY}"
+  local msg="Downloading $desc via $proxy"
   local rc total total_gb progress domain dots agent space folder
 
   rm -f "$iso"
@@ -566,7 +568,7 @@ downloadFile() {
 
   info "$msg..."
 
-  { wget "$url" -O "$iso" -q --timeout=30 --no-http-keep-alive --user-agent "$agent" --show-progress "$progress"; rc=$?; } || :
+  { wget "$url" -O "$iso" -q --proxy=="$proxy" --timeout=30 --no-http-keep-alive --user-agent "$agent" --show-progress "$progress"; rc=$?; } || :
 
   fKill "progress.sh"
 
