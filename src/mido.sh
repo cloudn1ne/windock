@@ -425,7 +425,7 @@ getESD() {
   local eFile="esd_edition.xml"
   local fFile="products_filter.xml"
 
-  { wget "$winCatalog" -O "$dir/$wFile" -e http_proxy="$proxy" -q --timeout=30 --no-http-keep-alive; rc=$?; } || :
+  { wget "$winCatalog" -O "$dir/$wFile" -e use_proxy=on -e http_proxy="$proxy" -e https_proxy="$proxy" -q --timeout=30 --no-http-keep-alive; rc=$?; } || :
 
   msg="Failed to download $winCatalog"
   (( rc == 3 )) && error "$msg , cannot write file (disk full?)" && return 1
@@ -568,7 +568,7 @@ downloadFile() {
 
   info "$msg..."
 
-  { wget "$url" -O "$iso" -q -e http_proxy="$proxy" --timeout=30 --no-http-keep-alive --user-agent "$agent" --show-progress "$progress"; rc=$?; } || :
+  { wget "$url" -O "$iso" -q -e use_proxy=on -e http_proxy="$proxy" -e https_proxy="$proxy" --timeout=30 --no-http-keep-alive --user-agent "$agent" --show-progress "$progress"; rc=$?; } || :
 
   fKill "progress.sh"
 
