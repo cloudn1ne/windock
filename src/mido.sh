@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+: "${PROXY:=""}"
+
 handle_curl_error() {
 
   local error_code="$1"
@@ -77,6 +79,7 @@ download_windows() {
   local product_edition_id=""
   local language_skuid_json=""
   local profile="606624d44113"
+  local proxy="${PROXY}"
 
   user_agent=$(get_agent)
   language=$(getLanguage "$lang" "name")
@@ -101,7 +104,7 @@ download_windows() {
   # Also, keeping a "$WindowsVersions" array like Fido does would be way too much of a maintenance burden
   # Remove "Accept" header that curl sends by default
   [[ "$DEBUG" == [Yy1]* ]] && echo "Parsing download page: ${url}"
-  download_page_html=$(curl --silent --max-time 30 --user-agent "$user_agent" --header "Accept:" --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url") || {
+  download_page_html=$(curl --silent --max-time 30 --proxy "$proxy" --user-agent "$user_agent" --header "Accept:" --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url") || {
     handle_curl_error "$?" "Microsoft"
     return $?
   }
@@ -117,7 +120,7 @@ download_windows() {
 
   [[ "$DEBUG" == [Yy1]* ]] && echo "Permit Session ID: $session_id"
   # Permit Session ID
-  curl --silent --max-time 30 --output /dev/null --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://vlscppe.microsoft.com/tags?org_id=y6jn8c31&session_id=$session_id" || {
+  curl --silent --max-time 30 --output /dev/null --proxy "$proxy"  --user-agent "$user_agent" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "https://vlscppe.microsoft.com/tags?org_id=y6jn8c31&session_id=$session_id" || {
     # This should only happen if there's been some change to how this API works
     handle_curl_error "$?" "Microsoft"
     return $?
@@ -125,7 +128,7 @@ download_windows() {
 
   [[ "$DEBUG" == [Yy1]* ]] && echo -n "Getting language SKU ID: "
   sku_url="https://www.microsoft.com/software-download-connector/api/getskuinformationbyproductedition?profile=$profile&ProductEditionId=$product_edition_id&SKU=undefined&friendlyFileName=undefined&Locale=en-US&sessionID=$session_id"
-  language_skuid_json=$(curl --silent --max-time 30 --request GET --user-agent "$user_agent" --referer "$url" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "$sku_url") || {
+  language_skuid_json=$(curl --silent --max-time 30 --proxy "$proxy" --request GET --user-agent "$user_agent" --referer "$url" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "$sku_url") || {
     handle_curl_error "$?" "Microsoft"
     return $?
   }
@@ -145,7 +148,7 @@ download_windows() {
   # If any request is going to be blocked by Microsoft it's always this last one (the previous requests always seem to succeed)
 
   iso_url="https://www.microsoft.com/software-download-connector/api/GetProductDownloadLinksBySku?profile=$profile&ProductEditionId=undefined&SKU=$sku_id&friendlyFileName=undefined&Locale=en-US&sessionID=$session_id"
-  iso_json=$(curl --silent --max-time 30 --request GET --user-agent "$user_agent" --referer "$url" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "$iso_url")
+  iso_json=$(curl --silent --max-time 30 --request GET --proxy "$proxy" --user-agent "$user_agent" --referer "$url" --header "Accept:" --max-filesize 100K --fail --proto =https --tlsv1.2 --http1.1 -- "$iso_url")
 
   if ! [ "$iso_json" ]; then
     # This should only happen if there's been some change to how this API works
@@ -186,6 +189,7 @@ download_windows_eval() {
   local user_agent=""
   local enterprise_type=""
   local windows_version=""
+  local proxy="${PROXY}"
 
   case "${id,,}" in
     "win11${PLATFORM,,}-enterprise-eval" )
@@ -233,7 +237,7 @@ download_windows_eval() {
   local url="https://www.microsoft.com/en-us/evalcenter/download-$windows_version"
 
   [[ "$DEBUG" == [Yy1]* ]] && echo "Parsing download page: ${url}"
-  iso_download_page_html=$(curl --silent --max-time 30 --user-agent "$user_agent" --location --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url") || {
+  iso_download_page_html=$(curl --silent --max-time 30 --proxy "$proxy" --user-agent "$user_agent" --location --max-filesize 1M --fail --proto =https --tlsv1.2 --http1.1 -- "$url") || {
     handle_curl_error "$?" "Microsoft"
     return $?
   }
@@ -290,7 +294,7 @@ download_windows_eval() {
   # Follow redirect so proceeding log message is useful
   # This is a request we make that Fido doesn't
 
-  iso_download_link=$(curl --silent --max-time 30 --user-agent "$user_agent" --location --output /dev/null --silent --write-out "%{url_effective}" --head --fail --proto =https --tlsv1.2 --http1.1 -- "$iso_download_link") || {
+  iso_download_link=$(curl --silent --max-time 30 --proxy "$proxy" --user-agent "$user_agent" --location --output /dev/null --silent --write-out "%{url_effective}" --head --fail --proto =https --tlsv1.2 --http1.1 -- "$iso_download_link") || {
     # This should only happen if the Microsoft servers are down
     handle_curl_error "$?" "Microsoft"
     return $?
