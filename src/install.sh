@@ -700,9 +700,13 @@ updateXML() {
 
   [ -z "$HEIGHT" ] && HEIGHT="720"
   [ -z "$WIDTH" ] && WIDTH="1280"
+  [ -z "$COMPUTERNAME" ] && COMPUTERNAME="*"
 
   sed -i "s/<VerticalResolution>1080<\/VerticalResolution>/<VerticalResolution>$HEIGHT<\/VerticalResolution>/g" "$asset"
   sed -i "s/<HorizontalResolution>1920<\/HorizontalResolution>/<HorizontalResolution>$WIDTH<\/HorizontalResolution>/g" "$asset"
+
+  # also set computername
+  sed -i "s/<ComputerName>1920<\/ComputerName>/<ComputerName>$COMPUTERNAME<\/ComputerName>/g" "$asset"
 
   culture=$(getLanguage "$language" "culture")
 
