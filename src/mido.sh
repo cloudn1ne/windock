@@ -615,6 +615,8 @@ downloadImage() {
     return 1
   fi
 
+  info "downloadImage() iso=$iso"
+
   if ! validVersion "$version" "en"; then
     error "Invalid VERSION specified, value \"$version\" is not recognized!" && return 1
   fi
