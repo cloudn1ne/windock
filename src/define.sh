@@ -15,6 +15,7 @@ set -Eeuo pipefail
 : "${LANGUAGE:=""}"
 : "${USERNAME:=""}"
 : "${PASSWORD:=""}"
+: "${COMPUTERNAME:=""}"
 
 MIRRORS=4
 
@@ -1569,6 +1570,8 @@ prepareInstall() {
 
   [ -z "$WIDTH" ] && WIDTH="1280"
   [ -z "$HEIGHT" ] && HEIGHT="720"
+  [ -z "$COMPUTERNAME" ] && $COMPUTERNAME="*"
+
 
   XHEX=$(printf '%x\n' "$WIDTH")
   YHEX=$(printf '%x\n' "$HEIGHT")
@@ -1620,7 +1623,7 @@ prepareInstall() {
           echo ""
           echo "[UserData]"
           echo "    FullName=\"$username\""
-          echo "    ComputerName=\"*\""
+          echo "    ComputerName=\"$COMPUTERNAME\""
           echo "    OrgName=\"Windows for Docker\""
           echo "    $KEY"
           echo ""
