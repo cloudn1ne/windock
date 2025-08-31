@@ -1134,6 +1134,9 @@ if ! startInstall; then
   exit 68
 fi
 
+
+info "Downloading to $ISO"
+
 if [ ! -s "$ISO" ] || [ ! -f "$ISO" ]; then
   if ! downloadImage "$ISO" "$VERSION" "$LANGUAGE"; then
     rm -f "$ISO" 2> /dev/null || true
