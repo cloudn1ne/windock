@@ -96,7 +96,8 @@ startInstall() {
   if [ -z "$CUSTOM" ]; then
 
     ISO=$(basename "$BOOT")
-    ISO="$TMP/$ISO"
+    # ISO="$TMP/$ISO"
+    ISO="/images/$ISO"
 
     if [ -f "$BOOT" ] && [ -s "$BOOT" ]; then
       mv -f "$BOOT" "$ISO"
