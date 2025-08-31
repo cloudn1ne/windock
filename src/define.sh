@@ -1570,7 +1570,7 @@ prepareInstall() {
 
   [ -z "$WIDTH" ] && WIDTH="1280"
   [ -z "$HEIGHT" ] && HEIGHT="720"
-  [ -z "$COMPUTERNAME" ] && $COMPUTERNAME="*"
+  [ -z "$COMPUTERNAME" ] && COMPUTERNAME="*"
 
 
   XHEX=$(printf '%x\n' "$WIDTH")
@@ -1623,7 +1623,7 @@ prepareInstall() {
           echo ""
           echo "[UserData]"
           echo "    FullName=\"$username\""
-          echo "    ComputerName=\"$COMPUTERNAME\""
+          echo "    ComputerName=$COMPUTERNAME"
           echo "    OrgName=\"Windows for Docker\""
           echo "    $KEY"
           echo ""
@@ -1649,6 +1649,9 @@ prepareInstall() {
           echo "    AllowConnections=1"
           echo ""
   } | unix2dos > "$target/WINNT.SIF"
+
+  # debug
+  cat "$target/WINNT.SIF"
 
   if [[ "$driver" == "2k3" ]]; then
     {       echo "[Components]"
