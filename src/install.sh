@@ -1165,9 +1165,9 @@ if ! updateImage "$DIR" "$XML" "$LANGUAGE"; then
   exit 63
 fi
 
-if ! removeImage "$ISO"; then
-  exit 64
-fi
+#if ! removeImage "$ISO"; then
+#  exit 64
+#fi
 
 if ! buildImage "$DIR"; then
   exit 65
